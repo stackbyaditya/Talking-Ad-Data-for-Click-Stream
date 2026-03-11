@@ -1,4 +1,4 @@
-"""Reusable preprocessing utilities for the realistic bot-detection dataset."""
+"""Reusable preprocessing utilities for the advanced bot-detection dataset."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from sklearn.preprocessing import OneHotEncoder, RobustScaler
 
 
 LOGGER = logging.getLogger(__name__)
-DATASET_PATH = Path("data/processed/final_training_dataset_realistic.csv")
+DATASET_PATH = Path("data/processed/final_training_dataset_advanced.csv")
 DROP_COLUMNS = [
     "session_id",
     "ip_address",
@@ -47,6 +47,13 @@ BASE_NUMERIC_FEATURES = [
     "click_interval_entropy",
     "bot_likelihood_score",
     "anomaly_score",
+    "movement_acceleration",
+    "mouse_direction_entropy",
+    "click_burst_score",
+    "session_idle_ratio",
+    "trajectory_smoothness",
+    "interaction_variability",
+    "behavioral_complexity",
 ]
 
 

@@ -28,6 +28,7 @@ from models.model_utils import (  # noqa: E402
     save_performance_summary,
 )
 from preprocessing.preprocess_dataset import prepare_train_test_data  # noqa: E402
+from preprocessing.behavioral_feature_engineering import main as build_advanced_dataset  # noqa: E402
 
 
 LOGGER = logging.getLogger("train_boosting_models")
@@ -43,6 +44,8 @@ def train_models() -> Dict[str, Dict[str, float]]:
     """Run preprocessing, train models, evaluate them, and save all outputs."""
     ensure_output_dir(OUTPUT_DIR)
 
+    LOGGER.info("Refreshing advanced behavioral dataset.")
+    build_advanced_dataset()
     LOGGER.info("Loading dataset and preprocessing features.")
     bundle = prepare_train_test_data()
     X_train_processed = bundle["X_train_processed"]
@@ -126,7 +129,7 @@ def train_models() -> Dict[str, Dict[str, float]]:
     LOGGER.info("Evaluation complete.")
     plot_roc_curves(roc_inputs, y_test, OUTPUT_DIR / "roc_curves_boosting.png")
     save_performance_summary(summary, OUTPUT_DIR / "model_performance_summary.json")
-    export_lstm_training_data(bundle["df"], OUTPUT_DIR / "lstm_training_data.npz")
+    export_lstm_training_data(bundle["df"], OUTPUT_DIR / "lstm_training_data_v3.npz")
     LOGGER.info("Saving outputs complete.")
     return summary
 

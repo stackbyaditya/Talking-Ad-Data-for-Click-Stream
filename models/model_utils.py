@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from sklearn.metrics import (
-    ConfusionMatrixDisplay,
     accuracy_score,
     classification_report,
     confusion_matrix,
@@ -27,14 +26,7 @@ from sklearn.preprocessing import label_binarize
 
 LOGGER = logging.getLogger(__name__)
 CLASS_NAMES = ["human", "moderate_bot", "advanced_bot"]
-SEQUENCE_FEATURES = [
-    "request_interval_mean",
-    "request_interval_std",
-    "click_interval_entropy",
-    "burstiness",
-    "session_duration_sec",
-    "requests_per_minute",
-]
+DEFAULT_SEQUENCE_DATA_PATH = Path("model_outputs/lstm_training_data_v3.npz")
 
 
 def ensure_output_dir(output_dir: Path) -> None:
@@ -139,23 +131,20 @@ def save_performance_summary(summary: Dict[str, Dict[str, float]], output_path: 
 
 
 def export_lstm_training_data(df, output_path: Path) -> None:
-    """Export grouped temporal sequences for future LSTM work."""
-    session_groups = df.groupby("session_id", sort=False)
-    sequences: List[np.ndarray] = []
-    labels: List[int] = []
+    """Export temporal sequences for future LSTM work using the v3 generator."""
+    from preprocessing.session_sequence_generator import build_sequence_dataset
 
-    for _, group in session_groups:
-        ordered_group = group.sort_values("session_id")
-        sequences.append(ordered_group[SEQUENCE_FEATURES].to_numpy(dtype=float))
-        labels.append(int(ordered_group["label"].iloc[0]))
+    X_sequences, y_labels, feature_names = build_sequence_dataset(df)
+    np.savez_compressed(
+        output_path,
+        X_sequences=X_sequences,
+        y_labels=y_labels,
+        feature_names=np.asarray(feature_names, dtype=object),
+    )
 
-    sequence_length = max(seq.shape[0] for seq in sequences)
-    feature_count = len(SEQUENCE_FEATURES)
-    X_sequences = np.zeros((len(sequences), sequence_length, feature_count), dtype=np.float32)
 
-    for idx, seq in enumerate(sequences):
-        X_sequences[idx, : seq.shape[0], :] = seq
-
-    y_labels = np.asarray(labels, dtype=np.int64)
-    np.savez_compressed(output_path, X_sequences=X_sequences, y_labels=y_labels)
-
+def load_lstm_training_data(input_path: Path = DEFAULT_SEQUENCE_DATA_PATH) -> Tuple[np.ndarray, np.ndarray, List[str]]:
+    """Load the v3 LSTM-ready temporal sequence dataset."""
+    payload = np.load(input_path, allow_pickle=True)
+    feature_names = payload["feature_names"].tolist()
+    return payload["X_sequences"], payload["y_labels"], feature_names
