@@ -1,0 +1,91 @@
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# ==============================
+# Virtual environments
+# ==============================
+venv/
+env/
+.venv/
+ENV/
+
+# ==============================
+# Jupyter Notebook
+# ==============================
+.ipynb_checkpoints/
+
+# ==============================
+# VS Code
+# ==============================
+.vscode/
+.history/
+
+# ==============================
+# OS files
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Logs
+# ==============================
+*.log
+
+# ==============================
+# Dataset files (large files)
+# ==============================
+data/raw/
+data/processed/
+*.csv
+*.tsv
+*.parquet
+
+# ==============================
+# Model artifacts
+# ==============================
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.model
+
+model_outputs/
+model_outputs_boosting/
+
+# ==============================
+# Experiment outputs
+# ==============================
+analysis_outputs/
+analysis_outputs_final/
+reports/
+
+# ==============================
+# Temporary / archive files
+# ==============================
+archive_unused/
+tmp/
+temp/
+
+# ==============================
+# Python build
+# ==============================
+build/
+dist/
+*.egg-info/
+
+# ==============================
+# Environment files
+# ==============================
+.env
+.env.local
+
+# ==============================
+# Kaggle files
+# ==============================
+kaggle.json
