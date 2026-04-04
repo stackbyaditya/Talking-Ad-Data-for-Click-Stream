@@ -1,5 +1,76 @@
 # Results Summary Across Model1 to Model4
 
+## Quick Comparison Tables
+
+### Model1 - Baseline (Tabular + Deep Learning)
+
+#### Boosting Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| RandomForest | 0.8828 | 0.8798 | 0.8828 | 0.8809 | 0.9768 |
+| XGBoost | 0.8939 | 0.8936 | 0.8939 | 0.8937 | 0.9809 |
+| LightGBM | 0.8928 | 0.8925 | 0.8928 | 0.8925 | 0.9803 |
+
+#### Deep Learning Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| CNN | 0.8585 | 0.8556 | 0.8585 | 0.8567 | 0.9641 |
+| LSTM | 0.8578 | 0.8562 | 0.8578 | 0.8566 | 0.9655 |
+| CNN-LSTM | 0.8526 | 0.8494 | 0.8526 | 0.8507 | 0.9640 |
+| CNN-BiLSTM | 0.8489 | 0.8482 | 0.8489 | 0.8484 | 0.9640 |
+| CNN-Attention-LSTM | 0.8504 | 0.8467 | 0.8504 | 0.8483 | 0.9641 |
+
+Best Model (Model1): `XGBoost`
+
+### Model2 - Improved Deep Learning
+
+#### Deep Learning Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| CNN_improved | 0.8422 | 0.8392 | 0.8422 | 0.8393 | 0.9578 |
+| LSTM_improved | 0.8474 | 0.8450 | 0.8474 | 0.8459 | 0.9600 |
+| CNN_LSTM_improved | 0.8407 | 0.8338 | 0.8407 | 0.8363 | 0.9614 |
+| CNN_BiLSTM_improved | 0.8415 | 0.8402 | 0.8415 | 0.8403 | 0.9595 |
+| CNN_Attention_LSTM_improved | 0.8459 | 0.8423 | 0.8459 | 0.8432 | 0.9625 |
+| Transformer_improved | 0.8570 | 0.8573 | 0.8570 | 0.8571 | 0.9668 |
+
+Best Model (Model2): `Transformer_improved`
+
+### Model3 - High-Accuracy Deep Learning
+
+#### Deep Learning Model
+
+| Model | Validation Accuracy | Validation Precision | Validation Recall | Validation F1 | Validation ROC-AUC | Test Accuracy | Test Precision | Test Recall | Test F1 | Test ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| HighAccuracy-CNN-BiLSTM | 0.8430 | 0.8543 | 0.8430 | 0.8473 | 0.9635 | 0.8526 | 0.8595 | 0.8526 | 0.8555 | 0.9623 |
+
+Best Model (Model3): `HighAccuracy-CNN-BiLSTM`
+
+### Model4 - Balanced Real-Human Experiment
+
+#### Boosting Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| RandomForest | 0.9133 | 0.9134 | 0.9133 | 0.9133 | 0.9826 |
+| XGBoost | 0.9225 | 0.9226 | 0.9225 | 0.9225 | 0.9832 |
+| LightGBM | 0.9208 | 0.9209 | 0.9208 | 0.9208 | 0.9826 |
+
+#### Deep Learning Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| CNN | 0.8856 | 0.8857 | 0.8856 | 0.8855 | 0.9701 |
+| LSTM | 0.8900 | 0.8900 | 0.8900 | 0.8900 | 0.9722 |
+| CNN-LSTM | 0.8900 | 0.8901 | 0.8900 | 0.8900 | 0.9712 |
+| CNN-BiLSTM | 0.8944 | 0.8945 | 0.8944 | 0.8944 | 0.9717 |
+| CNN-Attention-LSTM | 0.8889 | 0.8903 | 0.8889 | 0.8887 | 0.9717 |
+
+Best Model (Model4): `XGBoost`
+
 This file consolidates the saved results from every experiment generation in this repository, from the original baseline workflow to the current balanced real-human Model4 pipeline.
 
 ## 1. Experiment Progression Overview
