@@ -2,7 +2,7 @@
 
 Example:
     python scripts/convert_clickstream_json_to_training_csv.py ^
-        --input clickstream_20260318_235610.json ^
+        --input data/clickstream_20260318_235610.json ^
         --output data/processed/clickstream_20260318_235610_advanced.csv
 """
 
@@ -134,16 +134,65 @@ def load_json_records(path: Path) -> List[dict]:
     return records
 
 
+def normalize_summary_record(record: Mapping[str, object]) -> dict | None:
+    """Normalize nested website records into a flat session-summary shape."""
+    payload = record.get("payload")
+    payload = payload if isinstance(payload, Mapping) else {}
+
+    session_id = record.get("sessionId")
+    if not isinstance(session_id, str):
+        session_id = payload.get("sessionId")
+
+    temporal = record.get("temporal")
+    if not isinstance(temporal, Mapping):
+        temporal = payload.get("temporal")
+
+    behavior = record.get("behavior")
+    if not isinstance(behavior, Mapping):
+        behavior = payload.get("behavior")
+
+    traffic = record.get("traffic")
+    if not isinstance(traffic, Mapping):
+        traffic = payload.get("traffic")
+
+    events = record.get("events")
+    if not isinstance(events, list):
+        events = payload.get("events")
+
+    if not (
+        isinstance(session_id, str)
+        and isinstance(temporal, Mapping)
+        and isinstance(behavior, Mapping)
+        and isinstance(traffic, Mapping)
+    ):
+        return None
+
+    device = record.get("device")
+    device = device if isinstance(device, Mapping) else {}
+
+    return {
+        "sessionId": session_id,
+        "temporal": dict(temporal),
+        "behavior": dict(behavior),
+        "traffic": dict(traffic),
+        "events": list(events) if isinstance(events, list) else [],
+        "device": dict(device),
+        "ipAddress": record.get("ipAddress", "unknown"),
+        "geoLocation": record.get("geoLocation", "unknown"),
+        "createdAt": record.get("createdAt", record.get("receivedAt")),
+        "botType": payload.get("botType", record.get("botType")),
+        "rageClicks": payload.get("rageClicks", record.get("rageClicks")),
+        "engagementScore": payload.get("engagementScore", record.get("engagementScore")),
+    }
+
+
 def extract_latest_session_rows(records: Sequence[dict]) -> List[dict]:
     """Keep the latest summary row per session."""
-    session_rows = [
-        row
-        for row in records
-        if isinstance(row.get("sessionId"), str)
-        and isinstance(row.get("temporal"), dict)
-        and isinstance(row.get("behavior"), dict)
-        and isinstance(row.get("traffic"), dict)
-    ]
+    session_rows = []
+    for row in records:
+        normalized = normalize_summary_record(row)
+        if normalized is not None:
+            session_rows.append(normalized)
     if not session_rows:
         raise ValueError("No session summary rows were found in the JSON export.")
 
@@ -432,10 +481,12 @@ def build_rows(latest_rows: Sequence[dict]) -> pd.DataFrame:
         behavior = row.get("behavior", {})
         traffic = row.get("traffic", {})
         events = row.get("events", [])
-        user_agent = str(row.get("userAgent", "") or "")
-        browser = parse_browser(user_agent)
-        operating_system = parse_operating_system(user_agent)
-        device_type = parse_device_type(user_agent)
+        device = row.get("device", {})
+        device = device if isinstance(device, Mapping) else {}
+        user_agent = str(device.get("userAgent") or row.get("userAgent") or "")
+        browser = str(device.get("browser") or "").strip() or parse_browser(user_agent)
+        operating_system = str(device.get("os") or "").strip() or parse_operating_system(user_agent)
+        device_type = str(device.get("deviceType") or "").strip() or parse_device_type(user_agent)
         session_duration_sec = float(temporal.get("sessionDuration", 0.0) or 0.0) / 1000.0
         active_time_sec = float(temporal.get("activeTime", 0.0) or 0.0) / 1000.0
         path_length = float(behavior.get("mousePathLength", 0.0) or 0.0)
