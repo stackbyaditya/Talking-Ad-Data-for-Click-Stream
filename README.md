@@ -1,162 +1,124 @@
-# Clickstream Bot Detection
+# Click Stream Analysis for Bot Detection Using Machine Learning and Deep Learning
 
-Behavioral bot detection pipeline built from the TalkingData AdTracking Fraud Detection dataset plus real website clickstream exports. The repository supports dataset generation, advanced behavioral feature engineering, tabular boosting models, temporal deep-learning models, and experiment-specific reporting.
+## 1. Project Overview
+This repository implements an end-to-end behavioral bot-detection workflow built around the TalkingData AdTracking Fraud Detection dataset and real website clickstream exports. The project focuses on session-level behavioral fraud detection rather than static rule-based filtering. It combines data transformation, advanced feature engineering, tabular machine learning, temporal sequence modeling, visualization, and reporting.
 
-## Overview
+The repository now contains four experiment generations:
 
-This project reframes click fraud detection as a behavioral session-classification problem. Instead of relying only on static signals such as IPs or device identifiers, the pipeline models how a session behaves over time using temporal, movement, burstiness, entropy, and interaction-variability features.
+- `Model1`: baseline tabular + deep-learning workflow
+- `Model2`: improved deep-learning architectures
+- `Model3`: targeted high-accuracy deep-learning experiment
+- `Model4`: balanced real-human experiment and current best overall workflow
 
-The current workflow supports three classes:
+## 2. Problem Statement
+The learning objective is a three-class session-classification problem:
 
 - `human`
 - `moderate_bot`
 - `advanced_bot`
 
-## Current Best Experiment
+Instead of classifying isolated click events, the repository transforms data into session-level behavioral representations and sequence tensors so that models can learn temporal, statistical, and contextual differences between real users and automated traffic.
 
-The latest complete experiment is **Model4**, trained on the balanced real-human dataset:
+## 3. Dataset Description
 
-- dataset: `data/processed/final_training_dataset_real_human_balanced_advanced.csv`
-- rows: `6000`
-- class balance: `2000 human / 2000 moderate_bot / 2000 advanced_bot`
-- schema: `41 columns`
+### 3.1 Source Data
+The original source is the TalkingData AdTracking Fraud Detection dataset. The repository also supports real website clickstream JSON exports for extracting human behavioral sessions.
 
-Model4 includes:
+Important raw and intermediate files:
 
-- boosting models: `RandomForest`, `XGBoost`, `LightGBM`
-- deep learning models: `CNN`, `LSTM`, `CNN-LSTM`, `CNN-BiLSTM`, `CNN-Attention-LSTM`
-- isolated outputs under `Model4/`
+- raw website clickstream JSON: [`data/clickstream_20260318_235610.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/clickstream_20260318_235610.json)
+- converted advanced clickstream CSV: [`data/processed/clickstream_20260318_235610_advanced.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/clickstream_20260318_235610_advanced.csv)
+- extracted real-human advanced CSV: [`data/processed/real_human_clickstream_advanced.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/real_human_clickstream_advanced.csv)
+- expanded real-human advanced CSV: [`data/processed/real_human_clickstream_expanded_advanced.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/real_human_clickstream_expanded_advanced.csv)
 
-Model4 headline results:
+### 3.2 Published Training Datasets
 
-| Model | Accuracy | F1 Score | ROC-AUC |
-| --- | ---: | ---: | ---: |
-| XGBoost | 0.9225 | 0.9225 | 0.9832 |
-| LightGBM | 0.9208 | 0.9208 | 0.9826 |
-| RandomForest | 0.9133 | 0.9133 | 0.9826 |
-| CNN-BiLSTM | 0.8944 | 0.8944 | 0.9717 |
-| LSTM | 0.8900 | 0.8900 | 0.9722 |
-| CNN-LSTM | 0.8900 | 0.8900 | 0.9712 |
-| CNN-Attention-LSTM | 0.8889 | 0.8887 | 0.9717 |
-| CNN | 0.8856 | 0.8855 | 0.9701 |
+| Dataset | Rows | Columns | Purpose |
+| --- | ---: | ---: | --- |
+| [`final_training_dataset.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset.csv) | 9000 | 34 | Initial balanced synthetic dataset |
+| [`final_training_dataset_realistic.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset_realistic.csv) | 9000 | 34 | More realistic synthetic overlap dataset |
+| [`final_training_dataset_advanced.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset_advanced.csv) | 9000 | 41 | Main advanced synthetic dataset used by Model1 |
+| [`final_training_dataset_real_human_balanced_advanced.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset_real_human_balanced_advanced.csv) | 6000 | 41 | Final balanced real-human dataset used by Model4 |
 
-Best overall model: `XGBoost`
+### 3.3 Current Primary Dataset
+The current main experiment, Model4, uses:
 
-## Key Data Assets
+[`final_training_dataset_real_human_balanced_advanced.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset_real_human_balanced_advanced.csv)
 
-### Raw and intermediate inputs
+Class distribution:
 
-- raw website clickstream JSON: `data/clickstream_20260318_235610.json`
-- converted real-session advanced CSV: `data/processed/clickstream_20260318_235610_advanced.csv`
-- extracted real-human advanced CSV: `data/processed/real_human_clickstream_advanced.csv`
-- expanded real-human advanced CSV: `data/processed/real_human_clickstream_expanded_advanced.csv`
+- `human`: 2000
+- `moderate_bot`: 2000
+- `advanced_bot`: 2000
 
-### Main training datasets
+This dataset is the correct training dataset for:
 
-- `data/processed/final_training_dataset_advanced.csv`
-  previous 41-column synthetic advanced dataset
-- `data/processed/final_training_dataset_real_human_balanced_advanced.csv`
-  current primary dataset for Model4 boosting and deep learning workflows
+- boosting models in Model4
+- deep-learning models in Model4, after sequence generation
 
-## Repository Structure
+## 4. Feature Engineering
+The repository engineers four main feature families:
 
-```text
-Model1/
-  Original boosting + deep-learning experiment
-Model2/
-  Improved deep-learning experiment
-Model3/
-  High-accuracy deep-learning experiment
-Model4/
-  Balanced real-human experiment with self-contained outputs
-data/
-  Raw inputs and processed datasets
-preprocessing/
-  Shared preprocessing and sequence generation utilities
-scripts/
-  Dataset conversion and dataset-building scripts
-reports/
-  Supporting reports and summaries
-artifacts/
-  Shared preprocessing artifacts
-model_outputs/
-  Legacy shared model output artifacts
-```
+- behavioral features such as `mouse_speed_mean`, `mouse_speed_std`, `mouse_path_length`, `movement_std`
+- temporal features such as `request_interval_mean`, `request_interval_std`, `clicks_per_minute`, `burstiness`
+- contextual metadata such as `browser`, `operating_system`, `device_type`, `country`, `region`
+- heuristic features such as `bot_likelihood_score` and `anomaly_score`
 
-## Pipeline
+The advanced 41-column datasets also include derived behavioral descriptors:
 
-### 1. Convert raw clickstream JSON to advanced CSV
+- `movement_acceleration`
+- `mouse_direction_entropy`
+- `click_burst_score`
+- `session_idle_ratio`
+- `trajectory_smoothness`
+- `interaction_variability`
+- `behavioral_complexity`
 
-```bash
-python scripts/convert_clickstream_json_to_training_csv.py ^
-  --input data/clickstream_20260318_235610.json ^
-  --output data/processed/clickstream_20260318_235610_advanced.csv
-```
+## 5. Data Preprocessing Pipeline
+Tabular preprocessing is implemented in [`preprocessing/preprocess_dataset.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/preprocessing/preprocess_dataset.py).
 
-### 2. Build the balanced real-human training dataset
+The shared preprocessing flow:
 
-```bash
-python scripts/build_balanced_dataset_from_real_humans.py
-```
+1. loads the advanced session-level dataset
+2. validates missing values
+3. removes duplicates when necessary
+4. drops metadata columns not used for learning
+5. splits numeric and categorical features
+6. applies `RobustScaler` to numeric features
+7. applies `OneHotEncoder(handle_unknown="ignore")` to categorical features
 
-This produces:
+Model4 reuses this same preprocessing logic while pointing it to the balanced real-human dataset and storing its artifacts inside `Model4/outputs`.
 
-- `data/processed/real_human_clickstream_advanced.csv`
-- `data/processed/real_human_clickstream_expanded_advanced.csv`
-- `data/processed/final_training_dataset_real_human_balanced_advanced.csv`
+## 6. Sequence Generation
+Temporal sequence generation is implemented in [`preprocessing/session_sequence_generator.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/preprocessing/session_sequence_generator.py).
 
-### 3. Run the full Model4 experiment
+The repository creates fixed-length temporal tensors from session-level summary statistics. This enables CNN and recurrent models even when the training dataset is stored at the session level instead of raw event-stream level.
 
-```bash
-python Model4/models/run_model4_experiment.py
-```
+Sequence characteristics:
 
-Useful options:
+- sequence length: `25`
+- feature dimension: `15`
 
-```bash
-python Model4/models/run_model4_experiment.py --skip-dl
-python Model4/models/run_model4_experiment.py --dl-epochs 20 --dl-batch-size 64
-```
+Model4 generates its own sequence dataset from the balanced real-human source dataset and stores it in:
 
-## Model4 Outputs
+- [`Model4/outputs/sequence_artifacts/model4_sequence_dataset.npz`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model4/outputs/sequence_artifacts/model4_sequence_dataset.npz)
+- [`Model4/outputs/sequence_artifacts/model4_sequence_metadata.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model4/outputs/sequence_artifacts/model4_sequence_metadata.json)
 
-Model4 keeps all experiment artifacts self-contained:
+Model4 sequence tensor shape:
 
-- code: `Model4/models`
-- plots: `Model4/analysis/plots`
-- trained models and scalers: `Model4/outputs`
-- sequence artifacts: `Model4/outputs/sequence_artifacts`
-- final report: `Model4/reports/model4_experiment_summary.md`
+- `6000 x 25 x 15`
 
-Generated artifacts include:
-
-- trained boosting models
-- trained deep-learning models
-- preprocessing pipeline and sequence scaler
-- dataset validation report
-- per-model JSON and CSV summaries
-- class-wise classification reports
-- confusion matrices
-- ROC curves
-- feature-importance plots
-- training curves
-- combined comparison plots
-
-## Modeling Approach
-
-### Tabular models
+## 7. Machine Learning Models
+The tabular classification family in this repository includes:
 
 - `RandomForest`
 - `XGBoost`
 - `LightGBM`
 
-These models train directly on the advanced session-level feature matrix after:
+These models are trained on advanced session-level features and are strongest when the behavioral feature engineering is already informative. Across the repository, boosting models consistently outperform the deep-learning baselines on hard classification accuracy.
 
-- dropping metadata columns
-- robust scaling numeric features
-- one-hot encoding categorical features
-
-### Sequence models
+## 8. Deep Learning Models
+The deep-learning family includes:
 
 - `CNN`
 - `LSTM`
@@ -164,39 +126,184 @@ These models train directly on the advanced session-level feature matrix after:
 - `CNN-BiLSTM`
 - `CNN-Attention-LSTM`
 
-These models use synthetic temporal sequences generated from session-level advanced features. The sequence generator creates fixed-length behavioral tensors from the same source dataset used for boosting.
+Additional experiment-specific models include:
 
-## Feature Families
+- `Transformer_improved` in Model2
+- `HighAccuracy-CNN-BiLSTM` in Model3
 
-The advanced datasets include:
+In Model4, the deep-learning workflow remains aligned with the baseline family for comparability, but it uses the improved balanced real-human dataset as its source.
 
-- movement features such as `mouse_speed_mean`, `mouse_speed_std`, `mouse_path_length`
-- temporal features such as `request_interval_mean`, `request_interval_std`, `clicks_per_minute`
-- derived behavioral features such as `movement_acceleration`, `click_burst_score`, `session_idle_ratio`
-- contextual metadata such as `browser`, `operating_system`, `device_type`, `country`
-- heuristic signals such as `bot_likelihood_score` and `anomaly_score`
+## 9. Experimental Setup
 
-## Notes
+### 9.1 Shared Settings
 
-- `real_human_clickstream_advanced.csv` and `real_human_clickstream_expanded_advanced.csv` are support files, not the main final training dataset for Model4.
-- For Model4 deep learning, sequences are generated from `final_training_dataset_real_human_balanced_advanced.csv` before training.
-- Model1 to Model3 remain intact for prior experiments and comparisons.
+| Component | Setting |
+| --- | --- |
+| Random seed | 42 |
+| Tabular scaler | `RobustScaler` |
+| Categorical encoder | `OneHotEncoder(handle_unknown="ignore")` |
+| Sequence scaler | `StandardScaler` |
+| Deep learning optimizer | Adam |
+| DL learning rate | 0.001 |
+| DL batch size | 64 |
+| DL max epochs | 30 |
 
-## Requirements
+### 9.2 Split Strategy
 
-Core libraries used in this repository:
+- boosting models: stratified 80/20 train-test split
+- deep-learning models: stratified 70/15/15 train-validation-test split
 
-- Python
-- pandas
-- NumPy
-- scikit-learn
-- XGBoost
-- LightGBM
-- TensorFlow / Keras
-- matplotlib
-- seaborn
-- joblib
+### 9.3 Model4-Specific Notes
 
-## License
+- source dataset: `final_training_dataset_real_human_balanced_advanced.csv`
+- schema validation completed before training
+- missing values verified as zero
+- sequence generation verified before deep-learning training
+- all outputs isolated under `Model4/`
 
-This repository is intended for research and experimentation around behavioral click-fraud detection. Add a formal license file if you plan to distribute or publish it publicly.
+## 10. Evaluation Metrics
+The repository reports:
+
+- accuracy
+- weighted precision
+- weighted recall
+- weighted F1 score
+- weighted one-vs-rest ROC-AUC
+
+The evaluation outputs also include:
+
+- confusion matrices
+- ROC curves
+- feature importance plots for boosting models
+- training loss and accuracy curves for deep-learning models
+- model comparison plots
+
+## 11. Results Summary
+
+### 11.1 Model1 Baseline Results
+
+#### Boosting Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| RandomForest | 0.8828 | 0.8798 | 0.8828 | 0.8809 | 0.9768 |
+| XGBoost | 0.8939 | 0.8936 | 0.8939 | 0.8937 | 0.9809 |
+| LightGBM | 0.8928 | 0.8925 | 0.8928 | 0.8925 | 0.9803 |
+
+#### Deep Learning Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| CNN | 0.8585 | 0.8556 | 0.8585 | 0.8567 | 0.9641 |
+| LSTM | 0.8578 | 0.8562 | 0.8578 | 0.8566 | 0.9655 |
+| CNN-LSTM | 0.8526 | 0.8494 | 0.8526 | 0.8507 | 0.9640 |
+| CNN-BiLSTM | 0.8489 | 0.8482 | 0.8489 | 0.8484 | 0.9640 |
+| CNN-Attention-LSTM | 0.8504 | 0.8467 | 0.8504 | 0.8483 | 0.9641 |
+
+### 11.2 Model2 and Model3 Highlights
+
+| Experiment | Best Model | Accuracy | F1 Score | ROC-AUC |
+| --- | --- | ---: | ---: | ---: |
+| Model2 | Transformer_improved | 0.8570 | 0.8571 | 0.9668 |
+| Model3 | HighAccuracy-CNN-BiLSTM | 0.8526 | 0.8555 | 0.9623 |
+
+### 11.3 Model4 Final Results
+
+#### Boosting Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| RandomForest | 0.9133 | 0.9134 | 0.9133 | 0.9133 | 0.9826 |
+| XGBoost | 0.9225 | 0.9226 | 0.9225 | 0.9225 | 0.9832 |
+| LightGBM | 0.9208 | 0.9209 | 0.9208 | 0.9208 | 0.9826 |
+
+#### Deep Learning Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| CNN | 0.8856 | 0.8857 | 0.8856 | 0.8855 | 0.9701 |
+| LSTM | 0.8900 | 0.8900 | 0.8900 | 0.8900 | 0.9722 |
+| CNN-LSTM | 0.8900 | 0.8901 | 0.8900 | 0.8900 | 0.9712 |
+| CNN-BiLSTM | 0.8944 | 0.8945 | 0.8944 | 0.8944 | 0.9717 |
+| CNN-Attention-LSTM | 0.8889 | 0.8903 | 0.8889 | 0.8887 | 0.9717 |
+
+Best overall model in the repository:
+
+- `XGBoost` in Model4 with accuracy `0.9225`
+
+### 11.4 Main Takeaway
+The largest practical improvement in the repository came with Model4. The balanced real-human dataset improved both realism and performance, and it produced the strongest boosting and deep-learning results among comparable workflows.
+
+## 12. Key Observations
+
+1. Boosting models remain the strongest family on advanced session-level features.
+2. Model4 improved over Model1 by upgrading the training data, balancing the classes, and isolating experiment artifacts cleanly.
+3. Deep-learning models also improved in Model4, but still trail the best boosting models.
+4. Model2 and Model3 showed that architecture changes alone were not enough to outperform the tabular boosting baselines.
+5. The most meaningful gain came from improving the training dataset and workflow quality rather than adding architectural complexity alone.
+
+## 13. Limitations
+
+- The sequence tensors are still generated from session summaries rather than raw native event timelines.
+- Moderate and advanced bot classes are still constructed or sampled rather than directly collected from live production traffic.
+- The balanced training setup improves comparability but may differ from real deployment-time class imbalance.
+- Deep-learning models remain sensitive to the quality of the synthetic temporal representation.
+
+## 14. Future Work
+
+1. Replace synthetic sequence generation with native event-level interaction traces.
+2. Incorporate richer real-human interaction signals such as scroll, dwell, and cursor trajectories.
+3. Add stronger real-bot traffic sources for harder negative classes.
+4. Explore online or streaming fraud-detection settings.
+5. Investigate self-supervised or representation-learning methods for temporal behavior modeling.
+
+## 15. Repository Structure
+Shared datasets, preprocessing, and documentation remain at the repository root, while experiment-specific code and artifacts are grouped by model generation:
+
+```text
+Model1/
+  Baseline boosting + deep-learning experiment
+Model2/
+  Improved deep-learning experiment
+Model3/
+  High-accuracy deep-learning experiment
+Model4/
+  Balanced real-human experiment with isolated outputs
+data/
+  Raw inputs and processed datasets
+preprocessing/
+  Shared preprocessing and sequence generation utilities
+scripts/
+  Data conversion and dataset-building scripts
+reports/
+  Supporting reports and summaries
+artifacts/
+  Shared preprocessing artifacts
+model_outputs/
+  Legacy shared output artifacts
+```
+
+## 16. How to Reproduce the Experiments
+
+### Model4 End-to-End
+
+```bash
+python scripts/convert_clickstream_json_to_training_csv.py --input data/clickstream_20260318_235610.json --output data/processed/clickstream_20260318_235610_advanced.csv
+python scripts/build_balanced_dataset_from_real_humans.py
+python Model4/models/run_model4_experiment.py
+```
+
+### Useful Model4 Variants
+
+```bash
+python Model4/models/run_model4_experiment.py --skip-dl
+python Model4/models/run_model4_experiment.py --dl-epochs 20 --dl-batch-size 64
+```
+
+### Main Model4 Artifacts
+
+- [`Model4/outputs/combined_model_performance.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model4/outputs/combined_model_performance.json)
+- [`Model4/reports/model4_experiment_summary.md`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model4/reports/model4_experiment_summary.md)
+- [`Model4/README.md`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model4/README.md)
+
+This README keeps the original sectioned project format while updating the content for GitHub readability and adding the final Model4 experiment as the current main result.
