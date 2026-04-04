@@ -14,7 +14,7 @@ import pandas as pd
 LOGGER = logging.getLogger("session_sequence_generator")
 DATASET_PATH = Path("data/processed/final_training_dataset_advanced.csv")
 OUTPUT_PATH = Path("model_outputs/lstm_training_data_v3.npz")
-PLOT_PATH = Path("analysis/plots/example_session_sequence.png")
+PLOT_PATH = Path("Model1/analysis/plots/example_session_sequence.png")
 SEQUENCE_LENGTH = 25
 SEQUENCE_FEATURES = [
     "mouse_speed_mean",

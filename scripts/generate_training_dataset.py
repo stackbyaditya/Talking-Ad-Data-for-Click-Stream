@@ -473,7 +473,7 @@ def save_outputs(df: pd.DataFrame, report: Dict[str, object]) -> None:
     """Save the final dataset, report, and analysis plots."""
     processed_dir = Path("data/processed")
     reports_dir = Path("reports")
-    analysis_dir = Path("analysis_outputs_realistic")
+    analysis_dir = Path("Model1/analysis/dataset_generation/realistic")
     processed_dir.mkdir(parents=True, exist_ok=True)
     reports_dir.mkdir(parents=True, exist_ok=True)
     analysis_dir.mkdir(parents=True, exist_ok=True)

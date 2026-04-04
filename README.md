@@ -205,7 +205,7 @@ At each timestep, values such as mouse speed and request interval are sampled fr
 Sequences are useful because they encode local temporal context unavailable in aggregated tabular representations. Even though these sequences are synthetic rather than directly observed logs, they enable evaluation of convolutional and recurrent models under a consistent tensor format.
 
 ## 7. Machine Learning Models
-The tabular classification stage is implemented in [`models/train_boosting_models.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/models/train_boosting_models.py).
+The tabular classification stage is implemented in [`Model1/models/train_boosting_models.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/models/train_boosting_models.py).
 
 ### 7.1 Random Forest
 Random Forest is an ensemble bagging method that aggregates many decorrelated decision trees. For a given sample \(\mathbf{x}\), the final prediction is obtained by majority vote across trees. In this repository, the model uses 300 trees and maximum depth 15. It is robust to nonlinear interactions and mixed feature types, which makes it a strong baseline for behavioural tabular data.
@@ -223,7 +223,7 @@ LightGBM also performs gradient boosting but grows trees leaf-wise rather than l
 Tree-based methods perform well here because the dataset is structured, relatively compact, and dominated by engineered session descriptors rather than raw unstructured signals. Decision-tree ensembles can exploit thresholded interactions among burstiness, interval entropy, anomaly score, and device/network context without requiring very large sample sizes.
 
 ## 8. Deep Learning Models
-The sequence modelling stage is implemented in [`models/deep_learning/train_dl_models.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/models/deep_learning/train_dl_models.py), [`models/deep_learning/dl_model_architectures.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/models/deep_learning/dl_model_architectures.py), and [`models/deep_learning/dl_utils.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/models/deep_learning/dl_utils.py).
+The sequence modelling stage is implemented in [`Model1/models/deep_learning/train_dl_models.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/models/deep_learning/train_dl_models.py), [`Model1/models/deep_learning/dl_model_architectures.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/models/deep_learning/dl_model_architectures.py), and [`Model1/models/deep_learning/dl_utils.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/models/deep_learning/dl_utils.py).
 
 ### 8.1 CNN
 The CNN model uses two `Conv1D` blocks with 64 and 128 filters followed by max pooling, flattening, a dense hidden layer, and softmax output. It is designed to detect local temporal motifs such as click bursts, movement spikes, and pause signatures.
@@ -277,7 +277,7 @@ For multi-class classification, the implementation reports weighted precision, w
 
 ## 11. Results Summary
 ### 11.1 Boosting Models
-Results loaded from [`model_outputs/model_performance_summary.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/model_outputs/model_performance_summary.json):
+Results loaded from [`Model1/outputs/model_performance_summary.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/outputs/model_performance_summary.json):
 
 | Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
 |---|---:|---:|---:|---:|---:|
@@ -286,7 +286,7 @@ Results loaded from [`model_outputs/model_performance_summary.json`](/c:/Users/A
 | LightGBM | 0.8928 | 0.8925 | 0.8928 | 0.8925 | 0.9803 |
 
 ### 11.2 Deep Learning Models
-Results loaded from [`model_outputs/dl_model_performance_summary.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/model_outputs/dl_model_performance_summary.json):
+Results loaded from [`Model1/outputs/dl_model_performance_summary.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/outputs/dl_model_performance_summary.json):
 
 | Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
 |---|---:|---:|---:|---:|---:|
@@ -299,12 +299,12 @@ Results loaded from [`model_outputs/dl_model_performance_summary.json`](/c:/User
 ### 11.3 Visual Results
 The repository includes:
 
-- boosting ROC curves: [`roc_curves_boosting.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/model_outputs/roc_curves_boosting.png)
-- boosting confusion matrices: [`confusion_matrix_rf.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/model_outputs/confusion_matrix_rf.png), [`confusion_matrix_xgb.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/model_outputs/confusion_matrix_xgb.png), [`confusion_matrix_lgbm.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/model_outputs/confusion_matrix_lgbm.png)
-- feature importance plots: [`feature_importance_rf.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/model_outputs/feature_importance_rf.png), [`feature_importance_xgb.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/model_outputs/feature_importance_xgb.png)
-- deep learning training curves: [`training_accuracy_curves.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/analysis/plots/training_accuracy_curves.png), [`training_loss_curves.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/analysis/plots/training_loss_curves.png)
-- deep learning ROC and confusion matrices: [`roc_curves_dl_models.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/analysis/plots/roc_curves_dl_models.png), [`confusion_matrix_dl_models.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/analysis/plots/confusion_matrix_dl_models.png)
-- behavioural feature distribution plots such as [`movement_acceleration_distribution.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/analysis/plots/movement_acceleration_distribution.png), [`click_burst_score_distribution.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/analysis/plots/click_burst_score_distribution.png), and [`behavioral_complexity_distribution.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/analysis/plots/behavioral_complexity_distribution.png)
+- boosting ROC curves: [`roc_curves_boosting.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/outputs/roc_curves_boosting.png)
+- boosting confusion matrices: [`confusion_matrix_rf.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/outputs/confusion_matrix_rf.png), [`confusion_matrix_xgb.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/outputs/confusion_matrix_xgb.png), [`confusion_matrix_lgbm.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/outputs/confusion_matrix_lgbm.png)
+- feature importance plots: [`feature_importance_rf.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/outputs/feature_importance_rf.png), [`feature_importance_xgb.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/outputs/feature_importance_xgb.png)
+- deep learning training curves: [`training_accuracy_curves.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/analysis/plots/training_accuracy_curves.png), [`training_loss_curves.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/analysis/plots/training_loss_curves.png)
+- deep learning ROC and confusion matrices: [`roc_curves_dl_models.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/analysis/plots/roc_curves_dl_models.png), [`confusion_matrix_dl_models.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/analysis/plots/confusion_matrix_dl_models.png)
+- behavioural feature distribution plots such as [`movement_acceleration_distribution.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/analysis/plots/movement_acceleration_distribution.png), [`click_burst_score_distribution.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/analysis/plots/click_burst_score_distribution.png), and [`behavioral_complexity_distribution.png`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model1/analysis/plots/behavioral_complexity_distribution.png)
 
 ## 12. Key Observations
 1. Boosting models outperform the implemented deep learning baselines on the current dataset. XGBoost achieves the best overall accuracy and ROC-AUC.
@@ -333,9 +333,39 @@ Future improvements include:
 5. Explore domain adaptation and self-supervised pretraining for behavioural embeddings.
 
 ## 15. Repository Structure
-The documented repository structure, excluding temporary experimental folders, is:
+Shared datasets, preprocessing, and documentation remain at the repository root, while model-specific code and artifacts are grouped by experiment:
 
 ```text
+Model1/
+  models/
+    model_utils.py
+    train_boosting_models.py
+    deep_learning/
+      dl_model_architectures.py
+      dl_utils.py
+      train_dl_models.py
+  analysis/
+    behavioral_feature_plots.py
+    boosting_model_plots.py
+    generate_architecture_diagram.py
+    dataset_generation/
+      initial/
+      realistic/
+    human_synthetic/
+    plots/
+  outputs/
+Model2/
+  models/
+    deep_learning_improved/
+  analysis/
+    plots/
+  outputs/
+Model3/
+  models/
+    deep_learning_high_accuracy/
+  analysis/
+    plots/
+  outputs/
 preprocessing/
   behavioral_feature_engineering.py
   preprocess_dataset.py
@@ -343,16 +373,6 @@ preprocessing/
 scripts/
   process_kaggle_to_clickstream.py
   generate_training_dataset.py
-models/
-  model_utils.py
-  train_boosting_models.py
-  deep_learning/
-    dl_model_architectures.py
-    dl_utils.py
-    train_dl_models.py
-analysis/
-  behavioral_feature_plots.py
-  plots/
 data/
   processed/
 reports/
@@ -368,8 +388,8 @@ python scripts/process_kaggle_to_clickstream.py --input datasets/train_sample.cs
 python scripts/generate_training_dataset.py
 python preprocessing/behavioral_feature_engineering.py
 python preprocessing/session_sequence_generator.py
-python models/train_boosting_models.py
-python models/deep_learning/train_dl_models.py
+python Model1/models/train_boosting_models.py
+python Model1/models/deep_learning/train_dl_models.py
 ```
 
 Relevant generated outputs include [`reports/sample_transformed.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/reports/sample_transformed.csv), [`reports/kaggle_transform_report.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/reports/kaggle_transform_report.json), [`reports/behavioral_feature_summary.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/reports/behavioral_feature_summary.json), the trained tabular models, the sequence tensor, and the deep learning performance summary.

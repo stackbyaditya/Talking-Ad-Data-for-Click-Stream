@@ -1,0 +1,35 @@
+{
+  "model": "HighAccuracy-CNN-BiLSTM",
+  "feature_names": [
+    "mouse_speed_mean",
+    "mouse_speed_std",
+    "movement_std",
+    "coordinate_entropy",
+    "clicks_per_minute",
+    "requests_per_minute",
+    "request_interval_mean",
+    "request_interval_std",
+    "click_burst_score",
+    "behavioral_complexity",
+    "interaction_variability",
+    "session_idle_ratio",
+    "mouse_speed_delta",
+    "click_event",
+    "pause_event"
+  ],
+  "validation_accuracy": 0.8429629629629629,
+  "validation_precision": 0.8543299688572544,
+  "validation_recall": 0.8429629629629629,
+  "validation_f1_score": 0.8473492215162386,
+  "validation_roc_auc": 0.963473544973545,
+  "accuracy": 0.8525925925925926,
+  "precision": 0.8595375987323819,
+  "recall": 0.8525925925925926,
+  "f1_score": 0.8554681899861356,
+  "roc_auc": 0.9623305114638447,
+  "class_weights": {
+    "0": 0.6,
+    "1": 1.5,
+    "2": 1.5
+  }
+}
