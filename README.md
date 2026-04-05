@@ -1,14 +1,15 @@
 # Click Stream Analysis for Bot Detection Using Machine Learning and Deep Learning
 
 ## 1. Project Overview
-This repository implements an end-to-end behavioral bot-detection workflow built around the TalkingData AdTracking Fraud Detection dataset and real website clickstream exports. The project focuses on session-level behavioral fraud detection rather than static rule-based filtering. It combines data transformation, advanced feature engineering, tabular machine learning, temporal sequence modeling, visualization, and reporting.
+This repository implements an end-to-end behavioral bot-detection workflow built around the TalkingData AdTracking Fraud Detection dataset and real website clickstream exports. The project focuses on session-level behavioral fraud detection rather than static rule-based filtering. It combines data transformation, advanced feature engineering, tabular machine learning, temporal sequence modeling, adversarial robustness evaluation, visualization, and reporting.
 
-The repository now contains four experiment generations:
+The repository now contains five experiment generations:
 
 - `Model1`: baseline tabular + deep-learning workflow
 - `Model2`: improved deep-learning architectures
 - `Model3`: targeted high-accuracy deep-learning experiment
-- `Model4`: balanced real-human experiment and current best overall workflow
+- `Model4`: balanced real-human experiment
+- `Model5`: adversarially robust click-fraud detection with leakage-free tabular preprocessing
 
 ## 2. Problem Statement
 The learning objective is a three-class session-classification problem:
@@ -38,10 +39,10 @@ Important raw and intermediate files:
 | [`final_training_dataset.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset.csv) | 9000 | 34 | Initial balanced synthetic dataset |
 | [`final_training_dataset_realistic.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset_realistic.csv) | 9000 | 34 | More realistic synthetic overlap dataset |
 | [`final_training_dataset_advanced.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset_advanced.csv) | 9000 | 41 | Main advanced synthetic dataset used by Model1 |
-| [`final_training_dataset_real_human_balanced_advanced.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset_real_human_balanced_advanced.csv) | 6000 | 41 | Final balanced real-human dataset used by Model4 |
+| [`final_training_dataset_real_human_balanced_advanced.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset_real_human_balanced_advanced.csv) | 6000 | 41 | Final balanced real-human dataset used by Model4 and Model5 |
 
 ### 3.3 Current Primary Dataset
-The current main experiment, Model4, uses:
+The current main experiments, Model4 and Model5, use:
 
 [`final_training_dataset_real_human_balanced_advanced.csv`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/data/processed/final_training_dataset_real_human_balanced_advanced.csv)
 
@@ -51,10 +52,7 @@ Class distribution:
 - `moderate_bot`: 2000
 - `advanced_bot`: 2000
 
-This dataset is the correct training dataset for:
-
-- boosting models in Model4
-- deep-learning models in Model4, after sequence generation
+Model5 uses the same source dataset as Model4, but its tabular path explicitly excludes `country` and `region` after identifying those fields as leakage-prone shortcuts for the human class.
 
 ## 4. Feature Engineering
 The repository engineers four main feature families:
@@ -75,9 +73,9 @@ The advanced 41-column datasets also include derived behavioral descriptors:
 - `behavioral_complexity`
 
 ## 5. Data Preprocessing Pipeline
-Tabular preprocessing is implemented in [`preprocessing/preprocess_dataset.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/preprocessing/preprocess_dataset.py).
+Shared tabular preprocessing is implemented in [`preprocessing/preprocess_dataset.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/preprocessing/preprocess_dataset.py).
 
-The shared preprocessing flow:
+The common preprocessing flow:
 
 1. loads the advanced session-level dataset
 2. validates missing values
@@ -87,7 +85,10 @@ The shared preprocessing flow:
 6. applies `RobustScaler` to numeric features
 7. applies `OneHotEncoder(handle_unknown="ignore")` to categorical features
 
-Model4 reuses this same preprocessing logic while pointing it to the balanced real-human dataset and storing its artifacts inside `Model4/outputs`.
+Experiment-specific notes:
+
+- `Model4` reuses the shared preprocessing logic against the balanced real-human dataset.
+- `Model5` uses the same dataset and style, but excludes `country` and `region` from the tabular learning path to avoid leakage.
 
 ## 6. Sequence Generation
 Temporal sequence generation is implemented in [`preprocessing/session_sequence_generator.py`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/preprocessing/session_sequence_generator.py).
@@ -99,25 +100,18 @@ Sequence characteristics:
 - sequence length: `25`
 - feature dimension: `15`
 
-Model4 generates its own sequence dataset from the balanced real-human source dataset and stores it in:
+Model4 and Model5 each generate their own sequence artifacts from the same balanced source dataset.
 
-- [`Model4/outputs/sequence_artifacts/model4_sequence_dataset.npz`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model4/outputs/sequence_artifacts/model4_sequence_dataset.npz)
-- [`Model4/outputs/sequence_artifacts/model4_sequence_metadata.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model4/outputs/sequence_artifacts/model4_sequence_metadata.json)
+## 7. Model Families
 
-Model4 sequence tensor shape:
-
-- `6000 x 25 x 15`
-
-## 7. Machine Learning Models
-The tabular classification family in this repository includes:
+### 7.1 Tabular Models
+The tabular classification family includes:
 
 - `RandomForest`
 - `XGBoost`
 - `LightGBM`
 
-These models are trained on advanced session-level features and are strongest when the behavioral feature engineering is already informative. Across the repository, boosting models consistently outperform the deep-learning baselines on hard classification accuracy.
-
-## 8. Deep Learning Models
+### 7.2 Deep Learning Models
 The deep-learning family includes:
 
 - `CNN`
@@ -125,17 +119,27 @@ The deep-learning family includes:
 - `CNN-LSTM`
 - `CNN-BiLSTM`
 - `CNN-Attention-LSTM`
+- `Transformer` in Model5
 
 Additional experiment-specific models include:
 
 - `Transformer_improved` in Model2
 - `HighAccuracy-CNN-BiLSTM` in Model3
 
-In Model4, the deep-learning workflow remains aligned with the baseline family for comparability, but it uses the improved balanced real-human dataset as its source.
+### 7.3 Robustness Modules in Model5
+Model5 adds a full adversarial pipeline on top of the baseline models:
 
-## 9. Experimental Setup
+- threat model
+- tabular surrogate model for gradient attacks on tree ensembles
+- FGSM and PGD attacks
+- domain constraints for semantically valid adversarial samples
+- epsilon-vs-accuracy robustness curves
+- feature squeezing defense
+- adversarial training for hardened models
 
-### 9.1 Shared Settings
+## 8. Experimental Setup
+
+### 8.1 Shared Settings
 
 | Component | Setting |
 | --- | --- |
@@ -148,20 +152,21 @@ In Model4, the deep-learning workflow remains aligned with the baseline family f
 | DL batch size | 64 |
 | DL max epochs | 30 |
 
-### 9.2 Split Strategy
+### 8.2 Split Strategy
 
 - boosting models: stratified 80/20 train-test split
 - deep-learning models: stratified 70/15/15 train-validation-test split
 
-### 9.3 Model4-Specific Notes
+### 8.3 Model5-Specific Notes
 
 - source dataset: `final_training_dataset_real_human_balanced_advanced.csv`
-- schema validation completed before training
-- missing values verified as zero
-- sequence generation verified before deep-learning training
-- all outputs isolated under `Model4/`
+- tabular leakage fix: `country` and `region` excluded from tabular preprocessing
+- deep-learning path remains aligned to the Model4 sequence setup
+- robustness evaluation performed with FGSM and PGD
+- hardened models trained with adversarial augmentation
+- all outputs isolated under `Model5/`
 
-## 10. Evaluation Metrics
+## 9. Evaluation Metrics
 The repository reports:
 
 - accuracy
@@ -177,45 +182,40 @@ The evaluation outputs also include:
 - feature importance plots for boosting models
 - training loss and accuracy curves for deep-learning models
 - model comparison plots
+- adversarial accuracy and attack success rate
+- defense recovery and hardened-model comparisons
+- epsilon-vs-accuracy robustness curves
 
-## 11. Results Summary
+## 10. Results Summary
 
-### 11.1 Model1 Baseline Results
+### 10.1 Model1 Baseline
 
-#### Boosting Models
+| Best Model | Accuracy | ROC-AUC |
+| --- | ---: | ---: |
+| XGBoost | 0.8939 | 0.9809 |
 
-| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| RandomForest | 0.8828 | 0.8798 | 0.8828 | 0.8809 | 0.9768 |
-| XGBoost | 0.8939 | 0.8936 | 0.8939 | 0.8937 | 0.9809 |
-| LightGBM | 0.8928 | 0.8925 | 0.8928 | 0.8925 | 0.9803 |
+### 10.2 Model2 and Model3 Highlights
 
-#### Deep Learning Models
+| Experiment | Best Model | Accuracy | ROC-AUC |
+| --- | --- | ---: | ---: |
+| Model2 | Transformer_improved | 0.8570 | 0.9668 |
+| Model3 | HighAccuracy-CNN-BiLSTM | 0.8526 | 0.9623 |
 
-| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| CNN | 0.8585 | 0.8556 | 0.8585 | 0.8567 | 0.9641 |
-| LSTM | 0.8578 | 0.8562 | 0.8578 | 0.8566 | 0.9655 |
-| CNN-LSTM | 0.8526 | 0.8494 | 0.8526 | 0.8507 | 0.9640 |
-| CNN-BiLSTM | 0.8489 | 0.8482 | 0.8489 | 0.8484 | 0.9640 |
-| CNN-Attention-LSTM | 0.8504 | 0.8467 | 0.8504 | 0.8483 | 0.9641 |
+### 10.3 Model4 Balanced Real-Human Results
 
-### 11.2 Model2 and Model3 Highlights
+| Best Model | Accuracy | ROC-AUC |
+| --- | ---: | ---: |
+| XGBoost | 0.9225 | 0.9832 |
 
-| Experiment | Best Model | Accuracy | F1 Score | ROC-AUC |
-| --- | --- | ---: | ---: | ---: |
-| Model2 | Transformer_improved | 0.8570 | 0.8571 | 0.9668 |
-| Model3 | HighAccuracy-CNN-BiLSTM | 0.8526 | 0.8555 | 0.9623 |
-
-### 11.3 Model4 Final Results
+### 10.4 Model5 Leakage-Free Baseline Results
 
 #### Boosting Models
 
 | Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| RandomForest | 0.9133 | 0.9134 | 0.9133 | 0.9133 | 0.9826 |
-| XGBoost | 0.9225 | 0.9226 | 0.9225 | 0.9225 | 0.9832 |
-| LightGBM | 0.9208 | 0.9209 | 0.9208 | 0.9208 | 0.9826 |
+| RandomForest | 0.9167 | 0.9168 | 0.9167 | 0.9167 | 0.9824 |
+| XGBoost | 0.9217 | 0.9219 | 0.9217 | 0.9216 | 0.9829 |
+| LightGBM | 0.9258 | 0.9258 | 0.9258 | 0.9258 | 0.9824 |
 
 #### Deep Learning Models
 
@@ -226,39 +226,53 @@ The evaluation outputs also include:
 | CNN-LSTM | 0.8900 | 0.8901 | 0.8900 | 0.8900 | 0.9712 |
 | CNN-BiLSTM | 0.8944 | 0.8945 | 0.8944 | 0.8944 | 0.9717 |
 | CNN-Attention-LSTM | 0.8889 | 0.8903 | 0.8889 | 0.8887 | 0.9717 |
+| Transformer | 0.8811 | 0.8841 | 0.8811 | 0.8807 | 0.9729 |
 
-Best overall model in the repository:
+Best clean baseline overall in the repository:
 
-- `XGBoost` in Model4 with accuracy `0.9225`
+- `LightGBM` in Model5 with accuracy `0.9258`
 
-### 11.4 Main Takeaway
-The largest practical improvement in the repository came with Model4. The balanced real-human dataset improved both realism and performance, and it produced the strongest boosting and deep-learning results among comparable workflows.
+### 10.5 Model5 Robustness Highlights
 
-## 12. Key Observations
+Tabular PGD robustness:
 
-1. Boosting models remain the strongest family on advanced session-level features.
-2. Model4 improved over Model1 by upgrading the training data, balancing the classes, and isolating experiment artifacts cleanly.
-3. Deep-learning models also improved in Model4, but still trail the best boosting models.
-4. Model2 and Model3 showed that architecture changes alone were not enough to outperform the tabular boosting baselines.
-5. The most meaningful gain came from improving the training dataset and workflow quality rather than adding architectural complexity alone.
+| Model | Clean Accuracy | PGD Accuracy | PGD ASR |
+| --- | ---: | ---: | ---: |
+| RandomForest | 0.9167 | 0.6792 | 0.2586 |
+| XGBoost | 0.9217 | 0.5383 | 0.6091 |
+| LightGBM | 0.9258 | 0.5333 | 0.5035 |
 
-## 13. Limitations
+Best sequence baseline under PGD:
+
+| Model | Clean Accuracy | PGD Accuracy | PGD ASR |
+| --- | ---: | ---: | ---: |
+| Transformer | 0.8811 | 0.7211 | 0.0507 |
+
+Adversarial training recovery:
+
+| Hardened Model | Adversarial Accuracy | Hardened Accuracy | Recovery |
+| --- | ---: | ---: | ---: |
+| RandomForest-AdvTrain | 0.6792 | 0.9017 | 0.2225 |
+| XGBoost-AdvTrain | 0.5383 | 0.9083 | 0.3700 |
+| LightGBM-AdvTrain | 0.5333 | 0.9083 | 0.3750 |
+| CNN-BiLSTM-AdvTrain | 0.6633 | 0.8711 | 0.2078 |
+
+## 11. Key Observations
+
+1. Boosting models remain the strongest clean-data family on advanced session-level features.
+2. Model5 improved the clean tabular baseline beyond Model4, with `LightGBM` reaching `0.9258` accuracy after removing the leakage-prone geographic shortcut.
+3. The earlier dominance of `country_unknown` and `region_unknown` was a real dataset shortcut; removing those features made Model5 more defensible without hurting performance.
+4. Sequence models remain weaker on clean accuracy than boosting models, but some sequence architectures are relatively more stable under attack.
+5. Adversarial training is the most effective defense tested in Model5. Feature squeezing offers little benefit in this setting.
+
+## 12. Limitations
 
 - The sequence tensors are still generated from session summaries rather than raw native event timelines.
 - Moderate and advanced bot classes are still constructed or sampled rather than directly collected from live production traffic.
 - The balanced training setup improves comparability but may differ from real deployment-time class imbalance.
-- Deep-learning models remain sensitive to the quality of the synthetic temporal representation.
+- Model5 robustness is evaluated with a surrogate for tree-based models because gradient-based attacks are not directly available for the tree ensembles.
 
-## 14. Future Work
-
-1. Replace synthetic sequence generation with native event-level interaction traces.
-2. Incorporate richer real-human interaction signals such as scroll, dwell, and cursor trajectories.
-3. Add stronger real-bot traffic sources for harder negative classes.
-4. Explore online or streaming fraud-detection settings.
-5. Investigate self-supervised or representation-learning methods for temporal behavior modeling.
-
-## 15. Repository Structure
-Shared datasets, preprocessing, and documentation remain at the repository root, while experiment-specific code and artifacts are grouped by model generation:
+## 13. Repository Structure
 
 ```text
 Model1/
@@ -268,7 +282,9 @@ Model2/
 Model3/
   High-accuracy deep-learning experiment
 Model4/
-  Balanced real-human experiment with isolated outputs
+  Balanced real-human experiment
+Model5/
+  Leakage-free adversarially robust experiment
 data/
   Raw inputs and processed datasets
 preprocessing/
@@ -283,7 +299,7 @@ model_outputs/
   Legacy shared output artifacts
 ```
 
-## 16. How to Reproduce the Experiments
+## 14. How to Reproduce
 
 ### Model4 End-to-End
 
@@ -293,17 +309,18 @@ python scripts/build_balanced_dataset_from_real_humans.py
 python Model4/models/run_model4_experiment.py
 ```
 
-### Useful Model4 Variants
+### Model5 End-to-End
 
 ```bash
-python Model4/models/run_model4_experiment.py --skip-dl
-python Model4/models/run_model4_experiment.py --dl-epochs 20 --dl-batch-size 64
+python Model5/models/run_model5_experiment.py
 ```
 
-### Main Model4 Artifacts
+### Main Model5 Artifacts
 
-- [`Model4/outputs/combined_model_performance.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model4/outputs/combined_model_performance.json)
-- [`Model4/reports/model4_experiment_summary.md`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model4/reports/model4_experiment_summary.md)
-- [`Model4/README.md`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model4/README.md)
+- [`Model5/outputs/combined_model_performance.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model5/outputs/combined_model_performance.json)
+- [`Model5/outputs/adversarial/robustness_report.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model5/outputs/adversarial/robustness_report.json)
+- [`Model5/reports/model5_baseline_summary.md`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model5/reports/model5_baseline_summary.md)
+- [`Model5/reports/model5_robustness_summary.md`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model5/reports/model5_robustness_summary.md)
+- [`Model5/README.md`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model5/README.md)
 
-This README keeps the original sectioned project format while updating the content for GitHub readability and adding the final Model4 experiment as the current main result.
+This README reflects the current state of the repository, with Model5 as the strongest documented workflow for clean tabular performance and adversarial robustness analysis.

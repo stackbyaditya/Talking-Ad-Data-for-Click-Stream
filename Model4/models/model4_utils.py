@@ -175,9 +175,18 @@ def plot_behavioral_feature_distributions(df: pd.DataFrame, output_dir: Path) ->
     output_dir.mkdir(parents=True, exist_ok=True)
     palette = {"human": "#4C956C", "moderate_bot": "#F4A259", "advanced_bot": "#BC4B51"}
     for feature in BEHAVIORAL_PLOT_FEATURES:
+        if feature == "trajectory_smoothness":
+            plot_trajectory_smoothness_distribution(df, output_dir / f"{feature}_distribution.png", palette)
+            continue
+
+        lower_bound = float(df[feature].quantile(0.01))
+        upper_bound = float(df[feature].quantile(0.99))
+        clipped_df = df.loc[df[feature].between(lower_bound, upper_bound)].copy()
+        plot_df = clipped_df if not clipped_df.empty else df
+
         fig, ax = plt.subplots(figsize=(8, 5))
         sns.kdeplot(
-            data=df,
+            data=plot_df,
             x=feature,
             hue="label_name",
             common_norm=False,
@@ -190,9 +199,72 @@ def plot_behavioral_feature_distributions(df: pd.DataFrame, output_dir: Path) ->
         ax.set_title(f"{feature} Distribution")
         ax.set_xlabel(feature)
         ax.set_ylabel("Density")
+        ax.set_xlim(lower_bound, upper_bound)
         fig.tight_layout()
         fig.savefig(output_dir / f"{feature}_distribution.png", dpi=180)
         plt.close(fig)
+
+
+def plot_trajectory_smoothness_distribution(
+    df: pd.DataFrame,
+    output_path: Path,
+    palette: Dict[str, str],
+) -> None:
+    """Create a more interpretable trajectory_smoothness visualization.
+
+    The raw feature is extremely right-skewed, so a plain KDE is visually
+    dominated by the near-zero mass and hides the class separation. This plot
+    combines:
+    1. a clipped boxplot for the central 95 percent of raw values
+    2. a signed log-transformed violin plot to show the full distribution
+    """
+    lower_bound = float(df["trajectory_smoothness"].quantile(0.01))
+    upper_bound = float(df["trajectory_smoothness"].quantile(0.95))
+    clipped_df = df.copy()
+    clipped_df["trajectory_smoothness_clipped"] = clipped_df["trajectory_smoothness"].clip(lower=lower_bound, upper=upper_bound)
+
+    transformed_df = df.copy()
+    transformed_df["trajectory_smoothness_signed_log"] = np.sign(transformed_df["trajectory_smoothness"]) * np.log10(
+        1.0 + np.abs(transformed_df["trajectory_smoothness"])
+    )
+
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5))
+
+    sns.boxplot(
+        data=clipped_df,
+        x="label_name",
+        y="trajectory_smoothness_clipped",
+        hue="label_name",
+        order=CLASS_NAMES,
+        palette=palette,
+        showfliers=False,
+        legend=False,
+        ax=axes[0],
+    )
+    axes[0].set_title("Central 95% of Raw Values")
+    axes[0].set_xlabel("Class")
+    axes[0].set_ylabel("trajectory_smoothness")
+
+    sns.violinplot(
+        data=transformed_df,
+        x="label_name",
+        y="trajectory_smoothness_signed_log",
+        hue="label_name",
+        order=CLASS_NAMES,
+        palette=palette,
+        cut=0,
+        inner="quartile",
+        legend=False,
+        ax=axes[1],
+    )
+    axes[1].set_title("Signed log10(1 + |value|) Distribution")
+    axes[1].set_xlabel("Class")
+    axes[1].set_ylabel("signed log trajectory_smoothness")
+
+    fig.suptitle("trajectory_smoothness Distribution by Class", fontsize=16)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=180)
+    plt.close(fig)
 
 
 def plot_confusion_matrix(y_true, y_pred, title: str, output_path: Path) -> None:

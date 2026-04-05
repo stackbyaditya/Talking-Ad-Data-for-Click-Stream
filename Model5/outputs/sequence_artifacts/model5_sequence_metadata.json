@@ -1,0 +1,37 @@
+{
+  "source_dataset_path": "C:\\Users\\Aditya Kumar\\Desktop\\talkingdata-adtracking-fraud-detection\\data\\processed\\final_training_dataset_real_human_balanced_advanced.csv",
+  "sequence_dataset_path": "C:\\Users\\Aditya Kumar\\Desktop\\talkingdata-adtracking-fraud-detection\\Model5\\outputs\\sequence_artifacts\\model5_sequence_dataset.npz",
+  "sequence_shape": [
+    6000,
+    25,
+    15
+  ],
+  "sequence_dtype": "float32",
+  "label_shape": [
+    6000
+  ],
+  "feature_names": [
+    "mouse_speed_mean",
+    "mouse_speed_std",
+    "movement_std",
+    "coordinate_entropy",
+    "clicks_per_minute",
+    "requests_per_minute",
+    "request_interval_mean",
+    "request_interval_std",
+    "click_burst_score",
+    "behavioral_complexity",
+    "interaction_variability",
+    "session_idle_ratio",
+    "mouse_speed_delta",
+    "click_event",
+    "pause_event"
+  ],
+  "feature_count": 15,
+  "class_distribution": {
+    "human": 2000,
+    "moderate_bot": 2000,
+    "advanced_bot": 2000
+  },
+  "contains_nan": false
+}

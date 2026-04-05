@@ -1,4 +1,4 @@
-# Results Summary Across Model1 to Model4
+# Results Summary Across Model1 to Model5
 
 ## Quick Comparison Tables
 
@@ -41,8 +41,6 @@ Best Model (Model2): `Transformer_improved`
 
 ### Model3 - High-Accuracy Deep Learning
 
-#### Deep Learning Model
-
 | Model | Validation Accuracy | Validation Precision | Validation Recall | Validation F1 | Validation ROC-AUC | Test Accuracy | Test Precision | Test Recall | Test F1 | Test ROC-AUC |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | HighAccuracy-CNN-BiLSTM | 0.8430 | 0.8543 | 0.8430 | 0.8473 | 0.9635 | 0.8526 | 0.8595 | 0.8526 | 0.8555 | 0.9623 |
@@ -71,7 +69,48 @@ Best Model (Model3): `HighAccuracy-CNN-BiLSTM`
 
 Best Model (Model4): `XGBoost`
 
-This file consolidates the saved results from every experiment generation in this repository, from the original baseline workflow to the current balanced real-human Model4 pipeline.
+### Model5 - Leakage-Free Adversarially Robust Experiment
+
+#### Boosting Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| RandomForest | 0.9167 | 0.9168 | 0.9167 | 0.9167 | 0.9824 |
+| XGBoost | 0.9217 | 0.9219 | 0.9217 | 0.9216 | 0.9829 |
+| LightGBM | 0.9258 | 0.9258 | 0.9258 | 0.9258 | 0.9824 |
+
+#### Deep Learning Models
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| CNN | 0.8856 | 0.8857 | 0.8856 | 0.8855 | 0.9701 |
+| LSTM | 0.8900 | 0.8900 | 0.8900 | 0.8900 | 0.9722 |
+| CNN-LSTM | 0.8900 | 0.8901 | 0.8900 | 0.8900 | 0.9712 |
+| CNN-BiLSTM | 0.8944 | 0.8945 | 0.8944 | 0.8944 | 0.9717 |
+| CNN-Attention-LSTM | 0.8889 | 0.8903 | 0.8889 | 0.8887 | 0.9717 |
+| Transformer | 0.8811 | 0.8841 | 0.8811 | 0.8807 | 0.9729 |
+
+#### Model5 Robustness Highlights
+
+| Model | Clean Accuracy | FGSM Accuracy | PGD Accuracy | FGSM ASR | PGD ASR |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| RandomForest | 0.9167 | 0.8700 | 0.6792 | 0.0600 | 0.2586 |
+| XGBoost | 0.9217 | 0.6133 | 0.5383 | 0.5085 | 0.6091 |
+| LightGBM | 0.9258 | 0.6975 | 0.5333 | 0.3221 | 0.5035 |
+| CNN-BiLSTM | 0.8944 | 0.7378 | 0.6633 | 0.0139 | 0.1010 |
+
+#### Model5 Defense Highlights
+
+| Defense Model | Adversarial Accuracy | Hardened Accuracy | Recovery |
+| --- | ---: | ---: | ---: |
+| RandomForest-AdvTrain | 0.6792 | 0.9017 | 0.2225 |
+| XGBoost-AdvTrain | 0.5383 | 0.9083 | 0.3700 |
+| LightGBM-AdvTrain | 0.5333 | 0.9083 | 0.3750 |
+| CNN-BiLSTM-AdvTrain | 0.6633 | 0.8711 | 0.2078 |
+
+Best Clean Baseline (Model5): `LightGBM`
+
+This file consolidates the saved results from every experiment generation in this repository, from the original baseline workflow to the current leakage-free adversarial Model5 pipeline.
 
 ## 1. Experiment Progression Overview
 
@@ -81,218 +120,52 @@ This file consolidates the saved results from every experiment generation in thi
 | Model2 | Improved deep learning architectures | Legacy shared sequence dataset from advanced synthetic data | Residual CNN blocks, BatchNorm, Transformer, wider sequence models | `Transformer_improved` | 0.8570 | 0.9668 |
 | Model3 | High-capacity targeted deep learning | Legacy shared sequence dataset from advanced synthetic data | Single high-capacity CNN-BiLSTM with class weights and label smoothing | `HighAccuracy-CNN-BiLSTM` | 0.8526 | 0.9623 |
 | Model4 | Balanced real-human end-to-end experiment | `data/processed/final_training_dataset_real_human_balanced_advanced.csv` | Real-human-balanced dataset plus isolated boosting and DL workflow | `XGBoost` | 0.9225 | 0.9832 |
+| Model5 | Adversarially robust leakage-free experiment | `data/processed/final_training_dataset_real_human_balanced_advanced.csv` | Removed `country`/`region` leakage and added FGSM, PGD, defenses, hardened models | `LightGBM` | 0.9258 | 0.9824 |
 
-## 2. Model1 Baseline
-
-### Goal
-
-Model1 established the first complete end-to-end behavioral bot detection workflow in the repository:
-
-- advanced feature engineering
-- preprocessing pipeline
-- boosting baselines
-- temporal sequence generation
-- deep learning baselines
-- plots and summary outputs
-
-### Dataset Context
-
-- dataset: `data/processed/final_training_dataset_advanced.csv`
-- rows: `9000`
-- classes: `human`, `moderate_bot`, `advanced_bot`
-- class distribution: `5000 / 2000 / 2000`
-
-### Models and Results
-
-#### Boosting models
-
-| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| RandomForest | 0.8828 | 0.8798 | 0.8828 | 0.8809 | 0.9768 |
-| XGBoost | 0.8939 | 0.8936 | 0.8939 | 0.8937 | 0.9809 |
-| LightGBM | 0.8928 | 0.8925 | 0.8928 | 0.8925 | 0.9803 |
-
-#### Deep learning models
-
-| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| CNN | 0.8585 | 0.8556 | 0.8585 | 0.8567 | 0.9641 |
-| LSTM | 0.8578 | 0.8562 | 0.8578 | 0.8566 | 0.9655 |
-| CNN-LSTM | 0.8526 | 0.8494 | 0.8526 | 0.8507 | 0.9640 |
-| CNN-BiLSTM | 0.8489 | 0.8482 | 0.8489 | 0.8484 | 0.9640 |
-| CNN-Attention-LSTM | 0.8504 | 0.8467 | 0.8504 | 0.8483 | 0.9641 |
-
-### What Model1 Improved
-
-- Introduced the first stable benchmark for both boosting and deep learning.
-- Demonstrated that engineered behavioral features are strong enough for high-performing tabular classification.
-- Established the repository's shared preprocessing, evaluation, and plotting conventions.
-
-### Model1 Limitations
-
-- The dataset was still mostly synthetic and class-imbalanced toward humans.
-- Deep learning models used synthetic sequences generated from session summaries instead of native event streams.
-- Boosting clearly outperformed the DL baselines, which suggested the sequence signal was not yet rich enough.
-
-## 3. Model2 Improved Deep Learning
+## 2. Model5 Highlights
 
 ### Goal
 
-Model2 focused on improving sequence-model architecture quality without changing the broader data foundation.
+Model5 extends Model4 with two major changes:
 
-### Main Changes from Model1
+- fixes a leakage issue in the tabular path by excluding `country` and `region`
+- adds adversarial robustness evaluation and defenses on top of the balanced real-human dataset
 
-- residual convolutional blocks
-- BatchNormalization
-- larger recurrent layers
-- multi-head attention in the attention model
-- Transformer architecture added
+### Main Changes from Model4
 
-### Models and Results
+- retained the same balanced real-human source dataset and sequence workflow
+- rebuilt tabular preprocessing inside Model5 so `country` and `region` are excluded
+- trained the baseline boosting and deep-learning families in a self-contained Model5 experiment tree
+- added FGSM and PGD attacks
+- added a tabular surrogate model for attacking tree ensembles
+- added semantic/domain constraints for tabular perturbations
+- added epsilon curves, attack success rate, feature squeezing, and adversarial training
 
-| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| CNN_improved | 0.8422 | 0.8392 | 0.8422 | 0.8393 | 0.9578 |
-| LSTM_improved | 0.8474 | 0.8450 | 0.8474 | 0.8459 | 0.9600 |
-| CNN_LSTM_improved | 0.8407 | 0.8338 | 0.8407 | 0.8363 | 0.9614 |
-| CNN_BiLSTM_improved | 0.8415 | 0.8402 | 0.8415 | 0.8403 | 0.9595 |
-| CNN_Attention_LSTM_improved | 0.8459 | 0.8423 | 0.8459 | 0.8432 | 0.9625 |
-| Transformer_improved | 0.8570 | 0.8573 | 0.8570 | 0.8571 | 0.9668 |
+### Main Findings
 
-### What Model2 Improved
+- `LightGBM` is now the best clean baseline overall at `0.9258` accuracy.
+- `XGBoost` and `LightGBM` are highly vulnerable under the current constrained adversarial setting.
+- `RandomForest` is more stable than the boosting rank might suggest under PGD.
+- `Transformer` is the strongest sequence model under PGD accuracy, while `CNN-BiLSTM` remains the best clean sequence baseline.
+- Adversarial training is the most effective defense tested in Model5.
 
-- Tested more modern sequence architectures than Model1.
-- Added a Transformer baseline, which became the best Model2 performer.
-- Improved architectural sophistication and broadened the experimental comparison space.
-
-### Model2 Limitations
-
-- Improvements in architecture alone did not translate into better accuracy than Model1's boosting models.
-- Most improved DL models still underperformed even the original Model1 DL best case on hard classification.
-- The underlying sequence data remained synthetic and inherited the same structural limitations as Model1.
-
-## 4. Model3 High-Accuracy Deep Learning
-
-### Goal
-
-Model3 narrowed the search to one stronger deep-learning design rather than a broad family. It attempted to squeeze more performance out of the sequence path using a higher-capacity CNN-BiLSTM.
-
-### Main Changes from Model2
-
-- focused on one architecture instead of many
-- higher-capacity CNN-BiLSTM
-- Gaussian noise regularization
-- class weighting
-- label smoothing
-
-### Model and Results
-
-| Model | Validation Accuracy | Validation F1 | Validation ROC-AUC | Test Accuracy | Test F1 | Test ROC-AUC |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| HighAccuracy-CNN-BiLSTM | 0.8430 | 0.8473 | 0.9635 | 0.8526 | 0.8555 | 0.9623 |
-
-### What Model3 Improved
-
-- Introduced a more deliberate optimization strategy than Model2.
-- Added training-time techniques aimed at better generalization.
-- Produced a cleaner targeted experiment for the CNN-BiLSTM family.
-
-### Model3 Limitations
-
-- The final test accuracy still did not exceed Model1's best DL result in a meaningful way.
-- It remained a single-model experiment, so it improved focus but reduced breadth.
-- It still relied on the old synthetic sequence-generation setup rather than a more realistic input source.
-
-## 5. Model4 Balanced Real-Human Experiment
-
-### Goal
-
-Model4 is the current best-organized experiment and the strongest overall pipeline in the repository. It rebuilt the workflow around a better source dataset that combines real human data with balanced bot classes.
-
-### Dataset Context
-
-- dataset: `data/processed/final_training_dataset_real_human_balanced_advanced.csv`
-- rows: `6000`
-- columns: `41`
-- class distribution: `2000 human / 2000 moderate_bot / 2000 advanced_bot`
-- missing values: `0`
-- duplicate rows: `0`
-
-### Main Changes from Earlier Models
-
-- switched the main training dataset to a balanced real-human-based dataset
-- kept the same advanced 41-column schema for compatibility
-- created a self-contained Model4 workflow and artifact layout
-- trained boosting and deep-learning models from the same validated source dataset
-- generated Model4-specific sequences before deep-learning training
-
-### Models and Results
-
-#### Boosting models
-
-| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| RandomForest | 0.9133 | 0.9134 | 0.9133 | 0.9133 | 0.9826 |
-| XGBoost | 0.9225 | 0.9226 | 0.9225 | 0.9225 | 0.9832 |
-| LightGBM | 0.9208 | 0.9209 | 0.9208 | 0.9208 | 0.9826 |
-
-#### Deep learning models
-
-| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| CNN | 0.8856 | 0.8857 | 0.8856 | 0.8855 | 0.9701 |
-| LSTM | 0.8900 | 0.8900 | 0.8900 | 0.8900 | 0.9722 |
-| CNN-LSTM | 0.8900 | 0.8901 | 0.8900 | 0.8900 | 0.9712 |
-| CNN-BiLSTM | 0.8944 | 0.8945 | 0.8944 | 0.8944 | 0.9717 |
-| CNN-Attention-LSTM | 0.8889 | 0.8903 | 0.8889 | 0.8887 | 0.9717 |
-
-### What Model4 Improved
-
-- Delivered the best overall results in the repository.
-- Improved boosting performance over Model1, with XGBoost rising from 0.8939 to 0.9225 accuracy.
-- Improved all baseline DL family results over Model1 on the current balanced dataset.
-- Replaced the earlier more synthetic training emphasis with a more realistic human-data foundation.
-- Added a fully isolated experiment structure with dedicated reports, plots, scalers, models, and summaries.
-
-### Model4 Limitations
-
-- Deep-learning models still trail the best boosting models by a noticeable margin.
-- Sequence data are still synthesized from session-level summaries rather than raw user-interaction timelines.
-- Although the human class is now grounded in real data, moderate and advanced bot classes are still sampled from constructed data.
-
-## 6. How the Repository Improved Over Time
-
-### From Model1 to Model2
-
-- The project moved from baseline DL architectures to more ambitious sequence designs.
-- The main gain was architectural exploration, not final accuracy improvement.
-
-### From Model2 to Model3
-
-- The project moved from breadth to focus.
-- Instead of many "improved" architectures, it tested one targeted high-capacity model with stronger training controls.
-
-### From Model3 to Model4
-
-- The biggest improvement was not only architecture but data quality and experiment design.
-- Model4 introduced the balanced real-human dataset, which improved both realism and performance.
-- Model4 also restored a strong combined comparison between boosting and deep learning in a clean self-contained experiment.
-
-## 7. Best Models by Stage
+## 3. Best Models by Stage
 
 | Stage | Best Model | Accuracy | ROC-AUC | Notes |
 | --- | --- | ---: | ---: | --- |
 | Model1 | XGBoost | 0.8939 | 0.9809 | Best original baseline overall |
 | Model2 | Transformer_improved | 0.8570 | 0.9668 | Best improved DL architecture |
 | Model3 | HighAccuracy-CNN-BiLSTM | 0.8526 | 0.9623 | Focused high-capacity DL experiment |
-| Model4 | XGBoost | 0.9225 | 0.9832 | Current best overall model |
+| Model4 | XGBoost | 0.9225 | 0.9832 | Best pre-robustness clean baseline |
+| Model5 | LightGBM | 0.9258 | 0.9824 | Best leakage-free clean baseline |
 
-## 8. Final Interpretation
+## 4. Final Interpretation
 
-Across all four experiment generations, the clearest pattern is:
+Across all five experiment generations, the clearest pattern is:
 
-- boosting models are consistently the strongest performers on these engineered session features
-- deep learning improves when the data foundation improves, but architecture changes alone are not enough
-- the biggest practical step forward came with Model4 because it upgraded the training dataset and the experiment organization together
+- boosting models remain strongest on clean advanced session-level features
+- data quality and leakage control matter as much as architecture choice
+- Model5 improves the repository by making the tabular result more trustworthy and by adding a full adversarial evaluation layer
+- adversarial training substantially recovers robustness for both tabular and temporal models
 
-If the project continues beyond Model4, the next most meaningful improvement will likely come from better temporal data realism rather than simply adding more complex sequence architectures.
+If the project continues beyond Model5, the next most meaningful improvement is likely to come from more realistic event-level temporal data and stronger real-world threat modeling rather than more architectural complexity alone.
