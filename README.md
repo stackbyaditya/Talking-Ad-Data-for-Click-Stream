@@ -309,18 +309,4 @@ python scripts/build_balanced_dataset_from_real_humans.py
 python Model4/models/run_model4_experiment.py
 ```
 
-### Model5 End-to-End
-
-```bash
-python Model5/models/run_model5_experiment.py
-```
-
-### Main Model5 Artifacts
-
-- [`Model5/outputs/combined_model_performance.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model5/outputs/combined_model_performance.json)
-- [`Model5/outputs/adversarial/robustness_report.json`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model5/outputs/adversarial/robustness_report.json)
-- [`Model5/reports/model5_baseline_summary.md`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model5/reports/model5_baseline_summary.md)
-- [`Model5/reports/model5_robustness_summary.md`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model5/reports/model5_robustness_summary.md)
-- [`Model5/README.md`](/c:/Users/Aditya%20Kumar/Desktop/talkingdata-adtracking-fraud-detection/Model5/README.md)
-
 This README reflects the current state of the repository, with Model5 as the strongest documented workflow for clean tabular performance and adversarial robustness analysis.
