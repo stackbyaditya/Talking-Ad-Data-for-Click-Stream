@@ -51,6 +51,7 @@ data/processed/
 # ==============================
 *.pkl
 *.joblib
+!Model4/deploy/artifacts/**/pipeline.joblib
 *.h5
 *.pt
 *.model

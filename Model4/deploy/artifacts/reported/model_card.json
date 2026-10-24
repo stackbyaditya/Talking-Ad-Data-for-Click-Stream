@@ -1,0 +1,82 @@
+{
+  "variant": "reported",
+  "trained_utc": "2026-10-24T22:52:20.177550+00:00",
+  "n_rows": 6000,
+  "n_train": 4800,
+  "n_test": 1200,
+  "metrics": {
+    "accuracy": 0.9225,
+    "f1_weighted": 0.9224940659519244,
+    "roc_auc_ovr": 0.9831645833333332,
+    "confusion_matrix_rows_actual_cols_pred": [
+      [
+        400,
+        0,
+        0
+      ],
+      [
+        0,
+        357,
+        43
+      ],
+      [
+        0,
+        50,
+        350
+      ]
+    ],
+    "per_class": {
+      "human": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 400.0
+      },
+      "moderate_bot": {
+        "precision": 0.8771498771498771,
+        "recall": 0.8925,
+        "f1-score": 0.8847583643122676,
+        "support": 400.0
+      },
+      "advanced_bot": {
+        "precision": 0.8905852417302799,
+        "recall": 0.875,
+        "f1-score": 0.8827238335435057,
+        "support": 400.0
+      },
+      "accuracy": 0.9225,
+      "macro avg": {
+        "precision": 0.9225783729600523,
+        "recall": 0.9225,
+        "f1-score": 0.9224940659519244,
+        "support": 1200.0
+      },
+      "weighted avg": {
+        "precision": 0.9225783729600524,
+        "recall": 0.9225,
+        "f1-score": 0.9224940659519244,
+        "support": 1200.0
+      }
+    },
+    "cv5_accuracy_mean": 0.9111666666666667,
+    "cv5_accuracy_std": 0.00844261676127594
+  },
+  "versions": {
+    "python": "3.13.0",
+    "scikit_learn": "1.8.0",
+    "xgboost": "2.1.4",
+    "numpy": "2.5.2",
+    "pandas": "2.2.3",
+    "joblib": "1.5.3"
+  },
+  "pipeline_size_bytes": 2533303,
+  "dataset": {
+    "path": "data\\processed\\final_training_dataset_real_human_balanced_advanced.csv",
+    "sha256_16": "acafaf1a1ed0c988"
+  },
+  "leakage_probe": {
+    "share_of_humans_with_unknown_country_region": 1.0,
+    "share_of_bots_with_unknown_country_region": 0.0,
+    "accuracy_of_rule_unknown_country_region_means_human": 1.0
+  }
+}
