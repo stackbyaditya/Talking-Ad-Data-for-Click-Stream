@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clickstream Bot Detector</title>
+<meta name="description" content="A live demo that scores your cursor movement and clicks as human or automated.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&display=swap">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<canvas id="trace" aria-hidden="true"></canvas>
+<a class="skip" href="#reader">Skip to the article</a>
+
+<div class="layout">
+
+<div class="col">
+<header class="masthead">
+  <h1>Clickstream bot detector</h1>
+  <p class="lede">
+    Your cursor, clicks and scrolling are scored while you read.
+    {% if model.save_enabled %}Nothing is stored unless you choose to contribute a session.{% else %}Nothing you do here is stored.{% endif %}
+  </p>
+</header>
+
+  <main class="reader" id="reader">
+    <article>
+      <h2>What a cursor gives away</h2>
+      <p>Anyone can load a page. What is harder to fake is how they move through it. People pause, overshoot, change their mind and drift back to something they already read. Scripts mostly do not.</p>
+
+      <div class="ads ads-three" role="group" aria-label="Sample ads">
+        <button class="ad" type="button" data-ad aria-label="Sample ad one">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="14"/><path d="M24 10v28M10 24h28"/></svg>
+          <span class="ad-name">Sample ad</span>
+          <span class="ad-count">0 clicks</span>
+        </button>
+        <button class="ad" type="button" data-ad aria-label="Sample ad two">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 38 24 10l16 28Z"/><path d="M16 38l8-14 8 14"/></svg>
+          <span class="ad-name">Sample ad</span>
+          <span class="ad-count">0 clicks</span>
+        </button>
+        <button class="ad" type="button" data-ad aria-label="Sample ad three">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="10" width="28" height="28" rx="4"/><path d="M10 24h28M24 10v28"/></svg>
+          <span class="ad-name">Sample ad</span>
+          <span class="ad-count">0 clicks</span>
+        </button>
+      </div>
+
+      <p>This page records where your cursor goes, when you click and how you scroll. Twelve measurements come out of that: total distance travelled, the rhythm between clicks, how often you turn sharply, and so on. A gradient-boosted tree model (XGBoost) turns them into odds for three classes: human, moderate bot and advanced bot.</p>
+
+      <h3>Read it, then try to break it</h3>
+      <p>Browse normally for ten seconds and watch the verdict settle. Then run one of the scripts in the panel and compare. The model only sees the measurements. It never sees which button you pressed.</p>
+
+      <div class="ads ads-two" role="group" aria-label="More sample ads">
+        <button class="ad ad-wide" type="button" data-ad aria-label="Sample banner ad">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 24h36M30 12l12 12-12 12"/></svg>
+          <span class="ad-name">Sample banner</span>
+          <span class="ad-count">0 clicks</span>
+        </button>
+        <button class="ad" type="button" data-ad aria-label="Sample ad four">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="7"/></svg>
+          <span class="ad-name">Sample ad</span>
+          <span class="ad-count">0 clicks</span>
+        </button>
+      </div>
+
+      <h3>A fair warning about the model</h3>
+      <p>It learned from a small set of real sessions and a larger set of simulated bots, so it is strongest against bots that resemble the simulated ones. A script that moves smoothly and clicks slowly is the hard case. The panel shows which measurements drove each verdict, so you can judge it for yourself.</p>
+      <p>Clicking the ads is fine. Clicks are part of the signal.</p>
+    </article>
+  </main>
+</div>
+
+  <aside class="panel" aria-label="Live reading">
+
+    <section class="verdict" id="verdict" data-state="wait">
+      <div class="verdict-head">
+        <h2 id="headline">Not enough yet</h2>
+        <button class="btn btn-quiet" id="restart" type="button">Start over</button>
+      </div>
+      <p class="subline" id="subline">Move the cursor and scroll the page.</p>
+
+      <div class="odds" id="odds" role="img" aria-label="No odds yet">
+        <i data-c="human"></i><i data-c="moderate_bot"></i><i data-c="advanced_bot"></i>
+      </div>
+      <ul class="legend" id="legend">
+        <li data-c="human">Human <b>0%</b></li>
+        <li data-c="moderate_bot">Moderate bot <b>0%</b></li>
+        <li data-c="advanced_bot">Advanced bot <b>0%</b></li>
+      </ul>
+
+      <div class="evidence" id="evidence">
+        <div class="meter">
+          <span>Time</span>
+          <div class="track"><i id="m-time"></i></div>
+          <output id="m-time-v">0 of {{ model.gate.seconds }} s</output>
+        </div>
+        <div class="meter">
+          <span>Activity</span>
+          <div class="track"><i id="m-act"></i></div>
+          <output id="m-act-v">0 of {{ model.gate.mouse_events }} moves</output>
+        </div>
+      </div>
+    </section>
+
+    <section class="scripts">
+      <h3>Or run a script</h3>
+      <div class="script-list" role="group" aria-label="Demo scripts">
+        <button class="script" type="button" data-script="spammer" data-desc="Stays put and clicks twice a second." title="Stays put and clicks twice a second.">Click spammer</button>
+        <button class="script" type="button" data-script="teleporter" data-desc="Jumps onto an ad and clicks. No path in between." title="Jumps onto an ad and clicks. No path in between.">Teleporter</button>
+        <button class="script" type="button" data-script="patient" data-desc="Smooth curves and a steady click every few seconds." title="Smooth curves and a steady click every few seconds.">Patient bot</button>
+      </div>
+      <p class="status" id="script-status" role="status">Each script drives the cursor for 14 to 24 seconds. The model judges the movement, not the name.</p>
+    </section>
+
+    <section class="why">
+      <h3>Why the model said so</h3>
+      <p class="hint" id="why-hint">The five measurements that moved the verdict most will appear here.</p>
+      <ul class="drivers" id="drivers"></ul>
+    </section>
+
+    <section class="vitals" aria-label="This session">
+      <h3>This session</h3>
+      <dl>
+        <div><dt>Time</dt><dd id="v-time">0:00</dd></div>
+        <div><dt>Cursor moves</dt><dd id="v-moves">0</dd></div>
+        <div><dt>Clicks</dt><dd id="v-clicks">0</dd></div>
+        <div><dt>Distance</dt><dd id="v-path">0 px</dd></div>
+      </dl>
+    </section>
+
+    <section class="about">
+      <details>
+        <summary>About this model</summary>
+        <p>Variant <b>{{ model.variant }}</b> with {{ model.n_features }} behavioural features, served as a single scikit-learn pipeline.
+        {% if model.cv5_accuracy %}Five-fold cross-validated accuracy was {{ '%.1f' % (model.cv5_accuracy * 100) }}%, measured on the same simulated bot data it was trained on.{% endif %}</p>
+        <ul>{% for c in caveats %}<li>{{ c }}</li>{% endfor %}</ul>
+        <p class="hint" id="latency"></p>
+      </details>
+      {% if model.save_enabled %}
+      <details>
+        <summary>Contribute this session</summary>
+        <label class="consent">
+          <input type="checkbox" id="consent">
+          <span>I agree to save this session (cursor coordinates, click and scroll timestamps; no IP address, no user-agent, no cookies) as a labelled example of human behaviour.</span>
+        </label>
+        <button class="btn" id="save" type="button" disabled>Save this session as human</button>
+        <p class="status" id="save-msg" role="status"></p>
+      </details>
+      {% endif %}
+    </section>
+
+  </aside>
+</div>
+
+<div class="sr-only" id="sr" aria-live="polite"></div>
+
+<script id="boot" type="application/json">{{ model|tojson }}</script>
+<script src="{{ url_for('static', filename='tracker.js') }}"></script>
+<script src="{{ url_for('static', filename='trace.js') }}"></script>
+<script src="{{ url_for('static', filename='bots.js') }}"></script>
+<script src="{{ url_for('static', filename='ui.js') }}"></script>
+</body>
+</html>

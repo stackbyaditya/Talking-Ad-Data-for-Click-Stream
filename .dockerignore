@@ -1,0 +1,12 @@
+# allow-list: ignore everything, then re-include only what the image needs
+*
+!webapp/
+!public/
+!requirements.txt
+!Model4/deploy/features.py
+!Model4/deploy/artifacts/clean/
+webapp/tests
+webapp/tools
+Model4/deploy/artifacts/clean/xgb_model.json
+**/__pycache__
+**/*.pyc

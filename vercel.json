@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "wsgi.py": {
+      "maxDuration": 30,
+      "excludeFiles": "{data/**,Model1/**,Model2/**,Model3/**,Model4/models/**,Model4/outputs/**,Model4/reports/**,Model4/deploy/artifacts/reported/**,Model4/deploy/artifacts/clean/xgb_model.json,Model4/deploy/train_and_pickle.py,Model4/deploy/verify_features.py,preprocessing/**,scripts/**,reports/**,artifacts/**,model_outputs/**,webapp/tests/**,webapp/tools/**,**/*.md,**/*.ipynb,RESULTS,.git/**}"
+    }
+  }
+}

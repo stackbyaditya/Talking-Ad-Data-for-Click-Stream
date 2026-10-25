@@ -90,3 +90,7 @@ dist/
 # Kaggle files
 # ==============================
 kaggle.json
+data/collected/
+.vercel/
+.pytest_cache/
+__pycache__/

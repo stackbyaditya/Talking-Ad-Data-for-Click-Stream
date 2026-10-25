@@ -1,0 +1,11 @@
+# Deployment dependencies (Vercel and Docker). Versions match the environment the model was trained in,
+# because the pickled pipeline must be loaded by the same scikit-learn / xgboost / numpy versions.
+# xgboost-cpu is the same `xgboost` module without GPU code: 4.5 MB instead of 224 MB.
+# Locally, keep using your existing environment (it has the full xgboost); do not install this file over it.
+flask>=3.0,<4
+gunicorn>=22.0
+scikit-learn==1.8.0
+xgboost-cpu==2.1.4
+numpy==2.5.2
+pandas==2.2.3
+joblib==1.5.3
