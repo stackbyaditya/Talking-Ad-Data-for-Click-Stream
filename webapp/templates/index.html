@@ -18,7 +18,7 @@
 
 <div class="col">
 <header class="masthead">
-  <h1>Clickstream bot detector</h1>
+  <h1>Clickstream Bot Detector</h1>
   <p class="lede">
     Your cursor, clicks and scrolling are scored while you read.
     {% if model.save_enabled %}Nothing is stored unless you choose to contribute a session.{% else %}Nothing you do here is stored.{% endif %}
@@ -27,8 +27,8 @@
 
   <main class="reader" id="reader">
     <article>
-      <h2>What a cursor gives away</h2>
-      <p>Anyone can load a page. What is harder to fake is how they move through it. People pause, overshoot, change their mind and drift back to something they already read. Scripts mostly do not.</p>
+      <h2>What your cursor reveals</h2>
+      <p>Anyone can load a page, but few can convincingly imitate how a real person moves through one. Human visitors pause, overshoot, change direction and return to content they have already read. Automated scripts rarely reproduce that pattern.</p>
 
       <div class="ads ads-three" role="group" aria-label="Sample ads">
         <button class="ad" type="button" data-ad aria-label="Sample ad one">
@@ -50,8 +50,8 @@
 
       <p>This page records where your cursor goes, when you click and how you scroll. Twelve measurements come out of that: total distance travelled, the rhythm between clicks, how often you turn sharply, and so on. A gradient-boosted tree model (XGBoost) turns them into odds for three classes: human, moderate bot and advanced bot.</p>
 
-      <h3>Read it, then try to break it</h3>
-      <p>Browse normally for ten seconds and watch the verdict settle. Then run one of the scripts in the panel and compare. The model only sees the measurements. It never sees which button you pressed.</p>
+      <h3>Put the detector to the test</h3>
+      <p>Browse the page normally for about ten seconds and watch the verdict settle. Then run one of the demo scripts in the panel and compare the results. The model sees only behavioural measurements, never which button you pressed.</p>
 
       <div class="ads ads-two" role="group" aria-label="More sample ads">
         <button class="ad ad-wide" type="button" data-ad aria-label="Sample banner ad">
@@ -109,7 +109,6 @@
       <h3>Or run a script</h3>
       <div class="script-list" role="group" aria-label="Demo scripts">
         <button class="script" type="button" data-script="spammer" data-desc="Stays put and clicks twice a second." title="Stays put and clicks twice a second.">Click spammer</button>
-        <button class="script" type="button" data-script="teleporter" data-desc="Jumps onto an ad and clicks. No path in between." title="Jumps onto an ad and clicks. No path in between.">Teleporter</button>
         <button class="script" type="button" data-script="patient" data-desc="Smooth curves and a steady click every few seconds." title="Smooth curves and a steady click every few seconds.">Patient bot</button>
       </div>
       <p class="status" id="script-status" role="status">Each script drives the cursor for 14 to 24 seconds. The model judges the movement, not the name.</p>

@@ -9,7 +9,7 @@
   var ctx = canvas.getContext("2d");
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  var FADE_MS = 4500;      // how long a stretch of trail stays visible
+  var FADE_MS = 3200;      // how long a stretch of trail stays visible
   var GAP_MS = 350;        // a pause longer than this lifts the pen
   var RIPPLE_MS = 750;
 
@@ -61,11 +61,11 @@
       var connected = a && b.t - a.t <= GAP_MS;
       ctx.strokeStyle = ctx.fillStyle = palette[b.c] || palette.ink;
       if (connected) {
-        ctx.globalAlpha = life * 0.9;
-        ctx.lineWidth = 1.3 + 2.4 * life;
+        ctx.globalAlpha = life * 0.5;
+        ctx.lineWidth = 1.1 + 1.7 * life;
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       } else {
-        ctx.globalAlpha = life * 0.9;                       // pen lands: a small dot
+        ctx.globalAlpha = life * 0.5;                       // pen lands: a small dot
         ctx.beginPath(); ctx.arc(b.x, b.y, 2.4, 0, 6.2832); ctx.fill();
       }
     }

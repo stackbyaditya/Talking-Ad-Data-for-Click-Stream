@@ -54,18 +54,6 @@
     while (Date.now() < end && alive()) { fire("click", p.x, p.y); await sleep(470); }
   }
 
-  /* Jumps straight onto an ad and clicks; there is no path between targets. */
-  async function teleporter(alive) {
-    var end = Date.now() + 15000;
-    while (Date.now() < end && alive()) {
-      var p = pick();
-      fire("mousemove", p.x, p.y);
-      await sleep(60);
-      fire("click", p.x, p.y);
-      await sleep(1100 + Math.random() * 300);
-    }
-  }
-
   /* Smooth eased curves between ads and a click on a fixed rhythm. */
   async function patient(alive) {
     var end = Date.now() + 24000;
@@ -92,7 +80,6 @@
 
   var SCRIPTS = {
     spammer:    { label: "Click spammer", ms: 14000, fn: spammer },
-    teleporter: { label: "Teleporter",    ms: 15000, fn: teleporter },
     patient:    { label: "Patient bot",   ms: 24000, fn: patient }
   };
 
